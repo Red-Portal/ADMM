@@ -1,6 +1,14 @@
-.Rproj.user
-.Rhistory
-.RData
+*.out
+*~
+
+CMakeFiles
+CTestTestfile.cmake
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
 src/*.o
 src/*.so
 src/*.dll
+
+*.gch
