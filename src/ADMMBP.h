@@ -1,8 +1,12 @@
 #ifndef ADMMBP_H
 #define ADMMBP_H
 
+#include <Eigen/SparseCore>
+#include <Eigen/Cholesky>
+
 #include "FADMMBase.h"
 #include "Linalg/BlasWrapper.h"
+
 
 // Basis Pursuit
 //
