@@ -1,7 +1,7 @@
 #ifndef ADMMLAD_H
 #define ADMMLAD_H
 
-#include <Eigen/SparceCore>
+#include <Eigen/SparseCore>
 
 #include "FADMMBase.h"
 #include "Linalg/BlasWrapper.h"
