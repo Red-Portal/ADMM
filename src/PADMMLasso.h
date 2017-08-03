@@ -1,10 +1,16 @@
 #ifndef PADMMLASSO_H
 #define PADMMLASSO_H
 
+#include <Eigen/SparseCore>
+#include <Eigen/Cholesky>
+
 #include "PADMMBase.h"
 #include "Linalg/BlasWrapper.h"
 
-class PADMMLasso_Worker: public PADMMBase_Worker< float, Eigen::VectorXf, Eigen::SparseVector<float> >
+class PADMMLasso_Worker
+    : public PADMMBase_Worker< float,
+                               Eigen::VectorXf,
+                               Eigen::SparseVector<float> >
 {
 private:
     typedef Eigen::SparseVector<float> SparseVector;

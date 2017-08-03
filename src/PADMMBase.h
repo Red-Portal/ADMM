@@ -1,7 +1,6 @@
 #ifndef PADMMBASE_H
 #define PADMMBASE_H
 
-#include <RcppEigen.h>
 #include "Linalg/BlasWrapper.h"
 
 // Parallel ADMM by splitting observations
