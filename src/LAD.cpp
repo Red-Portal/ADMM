@@ -19,20 +19,23 @@ using Eigen::ArrayXd;
 
 std::tuple<ArrayXd, int>
 admm_lad(MatrixXd const& x_, VectorXd const& y_,
-         bool intercept_, ADMMParam const& opts__)
+         bool intercept_, ADMMParam const& opts_)
 {
+    MatrixXd x(x_);
+    VectorXd y(y_);
+
     int n = x_.rows();
     int p = x_.cols();
 
     int maxit = opts_.maxit;
-    double eps_abs = pts_.eps_abs;
+    double eps_abs = opts_.eps_abs;
     double eps_rel = opts_.eps_rel;
     double rho = opts_.rho;
 
     DataStd<double> datstd(n, p, true, intercept_);
-    datstd.standardize(x_, y_);
+    datstd.standardize(x, y);
 
-    ADMMLAD solver(x_, y_, rho, eps_abs, eps_rel);
+    ADMMLAD solver(x, y, rho, eps_abs, eps_rel);
 
     int niter = solver.solve(maxit);
     ArrayXd beta(p + 1);
