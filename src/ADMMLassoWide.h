@@ -1,6 +1,9 @@
 #ifndef ADMMLASSOWIDE_H
 #define ADMMLASSOWIDE_H
 
+#include <Eigen/SparseCore>
+#include <Eigen/Cholesky>
+
 #include "ADMMBase.h"
 #include "Linalg/BlasWrapper.h"
 #include "Spectra/SymEigsSolver.h"
