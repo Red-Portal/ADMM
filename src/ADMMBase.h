@@ -1,8 +1,9 @@
 #ifndef ADMMBASE_H
 #define ADMMBASE_H
 
-#include <RcppEigen.h>
 #include "Linalg/BlasWrapper.h"
+#include <iostream>
+#include <iomanip>
 
 // General problem setting
 //   minimize f(x) + g(z)
@@ -113,36 +114,77 @@ protected:
         const int width = 80;
         const char sep = ' ';
 
-        Rcpp::Rcout << std::endl << std::string(width, '=') << std::endl;
-        Rcpp::Rcout << std::string((width - title.length()) / 2, ' ') << title << std::endl;
-        Rcpp::Rcout << std::string(width, '-') << std::endl;
+        std::cout << std::endl <<
+            std::string(width, '=') << std::endl;
 
-        Rcpp::Rcout << std::left << std::setw(7)  << std::setfill(sep) << "iter";
-        Rcpp::Rcout << std::left << std::setw(13) << std::setfill(sep) << "eps_primal";
-        Rcpp::Rcout << std::left << std::setw(13) << std::setfill(sep) << "resid_primal";
-        Rcpp::Rcout << std::left << std::setw(13) << std::setfill(sep) << "eps_dual";
-        Rcpp::Rcout << std::left << std::setw(13) << std::setfill(sep) << "resid_dual";
-        Rcpp::Rcout << std::left << std::setw(13) << std::setfill(sep) << "rho";
-        Rcpp::Rcout << std::endl;
+        std::cout << std::string((width - title.length()) / 2, ' ')
+                  << title << std::endl;
 
-        Rcpp::Rcout << std::string(width, '-') << std::endl;
+        std::cout << std::string(width, '-') << std::endl;
+
+        std::cout << std::left
+                  << std::setw(7)
+                  << std::setfill(sep) << "iter";
+
+        std::cout << std::left
+                  << std::setw(13)
+                  << std::setfill(sep) << "eps_primal";
+
+        std::cout << std::left
+                  << std::setw(13)
+                  << std::setfill(sep) << "resid_primal";
+
+        std::cout << std::left
+                  << std::setw(13)
+                  << std::setfill(sep) << "eps_dual";
+
+        std::cout << std::left
+                  << std::setw(13)
+                  << std::setfill(sep) << "resid_dual";
+
+        std::cout << std::left
+                  << std::setw(13)
+                  << std::setfill(sep) << "rho";
+
+        std::cout << std::endl;
+
+        std::cout << std::string(width, '-') << std::endl;
     }
     void print_row(int iter)
     {
         const char sep = ' ';
 
-        Rcpp::Rcout << std::left << std::setw(7)  << std::setfill(sep) << iter;
-        Rcpp::Rcout << std::left << std::setw(13) << std::setfill(sep) << eps_primal;
-        Rcpp::Rcout << std::left << std::setw(13) << std::setfill(sep) << resid_primal;
-        Rcpp::Rcout << std::left << std::setw(13) << std::setfill(sep) << eps_dual;
-        Rcpp::Rcout << std::left << std::setw(13) << std::setfill(sep) << resid_dual;
-        Rcpp::Rcout << std::left << std::setw(13) << std::setfill(sep) << rho;
-        Rcpp::Rcout << std::endl;
+        std::cout << std::left
+                  << std::setw(7)
+                  << std::setfill(sep) << iter;
+
+        std::cout << std::left
+                  << std::setw(13)
+                  << std::setfill(sep) << eps_primal;
+
+        std::cout << std::left
+                  << std::setw(13)
+                  << std::setfill(sep) << resid_primal;
+
+        std::cout << std::left
+                  << std::setw(13)
+                  << std::setfill(sep) << eps_dual;
+
+        std::cout << std::left
+                  << std::setw(13)
+                  << std::setfill(sep) << resid_dual;
+
+        std::cout << std::left
+                  << std::setw(13)
+                  << std::setfill(sep) << rho;
+
+        std::cout << std::endl;
     }
     void print_footer()
     {
         const int width = 80;
-        Rcpp::Rcout << std::string(width, '=') << std::endl << std::endl;
+        std::cout << std::string(width, '=')
+                  << std::endl << std::endl;
     }
 
 public:
