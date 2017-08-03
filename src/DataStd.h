@@ -2,6 +2,7 @@
 #define DATASTD_H
 
 #include <Eigen/Core>
+#include <Eigen/SparseCore>
 
 #ifdef __AVX__
 #include "Linalg/AVX.h"

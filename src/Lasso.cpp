@@ -1,5 +1,8 @@
 #define EIGEN_DONT_PARALLELIZE
 
+#include <ADMM/parameters.h>
+#include <vector>
+
 #include "ADMMLassoTall.h"
 #include "ADMMLassoWide.h"
 #include "DataStd.h"
@@ -10,16 +13,18 @@ using Eigen::ArrayXf;
 using Eigen::ArrayXd;
 using Eigen::ArrayXXf;
 
-using Rcpp::wrap;
-using Rcpp::as;
-using Rcpp::List;
-using Rcpp::Named;
-using Rcpp::IntegerVector;
+// using Rcpp::wrap;
+// using Rcpp::as;
+// using Rcpp::List;
+// using Rcpp::Named;
+// using Rcpp::IntegerVector;
 
 typedef Eigen::SparseVector<float> SpVec;
 typedef Eigen::SparseMatrix<float> SpMat;
 
-inline void write_beta_matrix(SpMat &betas, int col, float beta0, SpVec &coef)
+inline void write_beta_matrix(SpMat &betas,
+                              int col, float beta0,
+                              SpVec &coef)
 {
     betas.insert(0, col) = beta0;
 
@@ -29,74 +34,70 @@ inline void write_beta_matrix(SpMat &betas, int col, float beta0, SpVec &coef)
     }
 }
 
-RcppExport SEXP admm_lasso(SEXP x_, SEXP y_, SEXP lambda_,
-                           SEXP nlambda_, SEXP lmin_ratio_,
-                           SEXP standardize_, SEXP intercept_,
-                           SEXP opts_)
+// SEXP admm_lasso(SEXP x_, SEXP y_, SEXP lambda_,
+//                 SEXP nlambda_, SEXP lmin_ratio_,
+//                 SEXP standardize_, SEXP intercept_,
+//                 SEXP opts_)
+
+std::tuple<ArrayXd, SpMat, std::vector<int>>
+admm_lasso(MatrixXf x_,VectorXf y_,
+           ArrayXd lambda_,
+           double lmin_ratio_,
+           bool const standardize_, bool const intercept_,
+           ADMMParam const& opts_)
 {
-BEGIN_RCPP
-
-    Rcpp::NumericMatrix xx(x_);
-    Rcpp::NumericVector yy(y_);
-
-    const int n = xx.rows();
-    const int p = xx.cols();
-
-    MatrixXf datX(n, p);
-    VectorXf datY(n);
-
-    // Copy data and convert type from double to float
-    std::copy(xx.begin(), xx.end(), datX.data());
-    std::copy(yy.begin(), yy.end(), datY.data());
-
     // In glmnet, we minimize
     //   1/(2n) * ||y - X * beta||^2 + lambda * ||beta||_1
     // which is equivalent to minimizing
     //   1/2 * ||y - X * beta||^2 + n * lambda * ||beta||_1
-    ArrayXd lambda(as<ArrayXd>(lambda_));
-    int nlambda = lambda.size();
+    int const n = x_.rows();
+    int const p = x_.cols();
 
-    List opts(opts_);
-    const int maxit        = as<int>(opts["maxit"]);
-    const double eps_abs   = as<double>(opts["eps_abs"]);
-    const double eps_rel   = as<double>(opts["eps_rel"]);
-    const double rho       = as<double>(opts["rho"]);
-    const bool standardize = as<bool>(standardize_);
-    const bool intercept   = as<bool>(intercept_);
+    int nlambda = lambda_.size();
 
-    DataStd<float> datstd(n, p, standardize, intercept);
-    datstd.standardize(datX, datY);
+    const int maxit        = opts_.maxit;
+    const double eps_abs   = opts_.eps_abs;
+    const double eps_rel   = opts_.eps_rel;
+    const double rho       = opts_.rho;
+
+    DataStd<float> datstd(n, p,
+                          standardize_, intercept_);
+    datstd.standardize(x_, y_);
 
     ADMMLassoTall *solver_tall;
     ADMMLassoWide *solver_wide;
 
-    if(n > p)
-        solver_tall = new ADMMLassoTall(datX, datY, eps_abs, eps_rel);
+    if(x_.rows() > y_.cols())
+        solver_tall = new ADMMLassoTall(x_, y_, eps_abs, eps_rel);
     else
-        solver_wide = new ADMMLassoWide(datX, datY, eps_abs, eps_rel);
+        solver_wide = new ADMMLassoWide(x_, y_, eps_abs, eps_rel);
 
     if(nlambda < 1)
     {
         double lmax = 0.0;
         if(n > p)
-            lmax = solver_tall->get_lambda_zero() / n * datstd.get_scaleY();
+            lmax = solver_tall->get_lambda_zero()
+                / n * datstd.get_scaleY();
         else
-            lmax = solver_wide->get_lambda_zero() / n * datstd.get_scaleY();
-        double lmin = as<double>(lmin_ratio_) * lmax;
-        lambda.setLinSpaced(as<int>(nlambda_), std::log(lmax), std::log(lmin));
-        lambda = lambda.exp();
-        nlambda = lambda.size();
+            lmax = solver_wide->get_lambda_zero()
+                / n * datstd.get_scaleY();
+
+        double lmin = lmin_ratio_ * lmax;
+        lambda_.setLinSpaced(nlambda,
+                             std::log(lmax), std::log(lmin));
+        lambda_ = lambda_.exp();
+        nlambda = lambda_.size();
     }
 
     SpMat beta(p + 1, nlambda);
     beta.reserve(Eigen::VectorXi::Constant(nlambda, std::min(n, p)));
 
-    IntegerVector niter(nlambda);
+    std::vector<int> niter(nlambda);
     double ilambda = 0.0;
 
     for(int i = 0; i < nlambda; i++)
     {
-        ilambda = lambda[i] * n / datstd.get_scaleY();
+        ilambda = lambda_[i] * n / datstd.get_scaleY();
         if(n > p)
         {
             if(i == 0)
@@ -109,7 +110,9 @@ BEGIN_RCPP
             float beta0 = 0.0;
             datstd.recover(beta0, res);
             write_beta_matrix(beta, i, beta0, res);
-        } else {
+        }
+        else
+        {
             if(i == 0)
                 solver_wide->init(ilambda, rho);
             else
@@ -130,9 +133,5 @@ BEGIN_RCPP
 
     beta.makeCompressed();
 
-    return List::create(Named("lambda") = lambda,
-                        Named("beta") = beta,
-                        Named("niter") = niter);
-
-END_RCPP
+    return {lambda_, beta, niter};
 }
