@@ -15,9 +15,9 @@ foreach(MAIN_FILE ${MAIN_SOURCE_FILES})
     message(STATUS "${MAIN_FILE}")
 endforeach()
 
-add_executable(${PROJECT_NAME} ${SOURCE_FILES})
+add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 
-set(BUILD_FLAGS  "-Wall -Wextra -O3")
+set(BUILD_FLAGS  "-fPIC -Wall -Wextra -O3")
 message("C++ flags = ${BUILD_FLAGS}")
 
 set_target_properties(${PROJECT_NAME}
