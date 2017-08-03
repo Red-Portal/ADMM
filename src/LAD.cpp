@@ -30,9 +30,9 @@ admm_lad(MatrixXd x_, VectorXd y_,
     double rho = opts_.rho;
 
     DataStd<double> datstd(n, p, true, intercept_);
-    datstd.standardize(x, y);
+    datstd.standardize(x_, y_);
 
-    ADMMLAD solver(x, y, rho, eps_abs, eps_rel);
+    ADMMLAD solver(x_, y_, rho, eps_abs, eps_rel);
 
     int niter = solver.solve(maxit);
     ArrayXd beta(p + 1);
