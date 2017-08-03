@@ -18,12 +18,9 @@ using Eigen::ArrayXd;
 // using Rcpp::Named;
 
 std::tuple<ArrayXd, int>
-admm_lad(MatrixXd const& x_, VectorXd const& y_,
+admm_lad(MatrixXd x_, VectorXd y_,
          bool intercept_, ADMMParam const& opts_)
 {
-    MatrixXd x(x_);
-    VectorXd y(y_);
-
     int n = x_.rows();
     int p = x_.cols();
 
