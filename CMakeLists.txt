@@ -19,9 +19,15 @@ add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
 set(BUILD_FLAGS  "-Wall -Wextra -O3")
 message("C++ flags = ${BUILD_FLAGS}")
+
 set_target_properties(${PROJECT_NAME}
     PROPERTIES COMPILE_FLAGS "${BUILD_FLAGS}")
 
+set_target_properties(${PROJECT_NAME}
+    PROPERTIES
+    CXX_STANDARD 17)
+
 target_include_directories(${PROJECT_NAME}
     PRIVATE
-    include/eigen/Eigen)
+    include/
+    include/eigen)
