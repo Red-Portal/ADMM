@@ -31,3 +31,6 @@ target_include_directories(${PROJECT_NAME}
     PRIVATE
     include/
     include/eigen)
+
+install(TARGETS ${PROJECT_NAME}
+    LIBRARY DESTINATION ${PROJECT_SOURCE_DIR}/lib/)
