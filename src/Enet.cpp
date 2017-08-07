@@ -2,16 +2,16 @@
 
 #include <vector>
 
-#include <ADMM/parameters.h>
+#include <ADMM/ADMM.h>
 
 #include "ADMMEnet.h"
 #include "DataStd.h"
 
-using Eigen::MatrixXf;
-using Eigen::VectorXf;
-using Eigen::ArrayXf;
-using Eigen::ArrayXd;
-using Eigen::ArrayXXf;
+// using Eigen::MatrixXf;
+// using Eigen::VectorXf;
+// using Eigen::ArrayXf;
+// using Eigen::ArrayXd;
+// using Eigen::ArrayXXf;
 
 // using Rcpp::wrap;
 // using Rcpp::as;
@@ -19,20 +19,22 @@ using Eigen::ArrayXXf;
 // using Rcpp::Named;
 // using Rcpp::IntegerVector;
 
-typedef Eigen::SparseVector<float> SpVec;
-typedef Eigen::SparseMatrix<float> SpMat;
+// typedef Eigen::SparseVector<float> SpVec;
+// typedef Eigen::SparseMatrix<float> SpMat;
 
-inline void write_beta_matrix(SpMat &betas, int col, float beta0, SpVec &coef)
+template<typename T>
+inline void write_beta_matrix(SpMat<T> &betas, int col, float beta0, SpVec<T> &coef)
 {
     betas.insert(0, col) = beta0;
 
-    for(SpVec::InnerIterator iter(coef); iter; ++iter)
+    for(typename SpVec<T>::InnerIterator iter(coef); iter; ++iter)
     {
         betas.insert(iter.index() + 1, col) = iter.value();
     }
 }
 
-std::tuple<ArrayXd, SpMat, std::vector<int>>
+std::tuple<ArrayXd, SpMat<float>, std::vector<int>>
+ADMM::
 admm_enet(MatrixXf x_, VectorXf y_,
           ArrayXd lambda_,
           double lmin_ratio_,
@@ -77,7 +79,7 @@ admm_enet(MatrixXf x_, VectorXf y_,
         nlambda = lambda_.size();
     }
 
-    SpMat beta(p + 1, nlambda);
+    SpMat<float> beta(p + 1, nlambda);
     beta.reserve(Eigen::VectorXi::Constant(nlambda, std::min(n, p)));
 
     std::vector<int> niter(nlambda);
@@ -94,7 +96,7 @@ admm_enet(MatrixXf x_, VectorXf y_,
                 solver_tall->init_warm(ilambda);
 
             niter[i] = solver_tall->solve(maxit);
-            SpVec res = solver_tall->get_z();
+            SpVec<float> res = solver_tall->get_z();
             float beta0 = 0.0;
             datstd.recover(beta0, res);
             write_beta_matrix(beta, i, beta0, res);
@@ -105,7 +107,7 @@ admm_enet(MatrixXf x_, VectorXf y_,
                 solver_wide->init_warm(ilambda);
 
             niter[i] = solver_wide->solve(maxit);
-            SpVec res = solver_wide->get_x();
+            SpVec<float> res = solver_wide->get_x();
             float beta0 = 0.0;
             datstd.recover(beta0, res);
             write_beta_matrix(beta, i, beta0, res);

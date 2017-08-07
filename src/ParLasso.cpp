@@ -1,4 +1,4 @@
-#include <ADMM/parameters.h>
+#include <ADMM/ADMM.h>
 
 #include "PADMMLasso.h"
 #include "DataStd.h"
@@ -7,11 +7,11 @@
 #include <omp.h>
 #endif
 
-using Eigen::MatrixXf;
-using Eigen::VectorXf;
-using Eigen::ArrayXf;
-using Eigen::ArrayXd;
-using Eigen::ArrayXXf;
+// using Eigen::MatrixXf;
+// using Eigen::VectorXf;
+// using Eigen::ArrayXf;
+// using Eigen::ArrayXd;
+// using Eigen::ArrayXXf;
 
 // using Rcpp::wrap;
 // using Rcpp::as;
@@ -19,22 +19,25 @@ using Eigen::ArrayXXf;
 // using Rcpp::Named;
 // using Rcpp::IntegerVector;
 
-typedef Eigen::SparseVector<float> SpVec;
-typedef Eigen::SparseMatrix<float> SpMat;
+// typedef Eigen::SparseVector<float> SpVec;
+// typedef Eigen::SparseMatrix<float> SpMat;
 
-inline void write_beta_matrix(SpMat &betas,
+template<typename T>
+inline void write_beta_matrix(SpMat<T> &betas,
                               int col, float beta0,
-                              SpVec &coef)
+                              SpVec<T> &coef)
 {
     betas.insert(0, col) = beta0;
 
-    for(SpVec::InnerIterator iter(coef); iter; ++iter)
+    for(typename SpVec<T>::InnerIterator iter(coef); iter; ++iter)
     {
         betas.insert(iter.index() + 1, col) = iter.value();
     }
 }
 
-std::tuple<ArrayXd, SpMat, std::vector<int>>
+
+std::tuple<ArrayXd, SpMat<float>, std::vector<int>>
+ADMM::
 admm_parlasso(MatrixXf x_, VectorXf y_,
               ArrayXd lambda_,
               double lmin_ratio_,
@@ -75,7 +78,7 @@ admm_parlasso(MatrixXf x_, VectorXf y_,
         nlambda = lambda_.size();
     }
 
-    SpMat beta(p + 1, nlambda);
+    SpMat<float> beta(p + 1, nlambda);
     beta.reserve(
         Eigen::VectorXi::Constant(
             nlambda, std::min(n, p)));
@@ -92,7 +95,7 @@ admm_parlasso(MatrixXf x_, VectorXf y_,
             solver.init_warm(ilambda);
 
         niter[i] = solver.solve(maxit);
-        SpVec res = solver.get_z();
+        SpVec<float> res = solver.get_z();
         float beta0 = 0.0;
         datstd.recover(beta0, res);
         write_beta_matrix(beta, i, beta0, res);

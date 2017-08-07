@@ -2,10 +2,10 @@
 
 #include "ADMMBP.h"
 
-#include <ADMM/parameters.h>
+#include <ADMM/ADMM.h>
 
-using Eigen::MatrixXd;
-using Eigen::VectorXd;
+// using Eigen::MatrixXd;
+// using Eigen::VectorXd;
 // using Eigen::ArrayXd;
 
 // using Rcpp::wrap;
@@ -16,12 +16,13 @@ using Eigen::VectorXd;
 // using Rcpp::NumericMatrix;
 // using Rcpp::Named;
 
-typedef Eigen::Map<const MatrixXd> MapMat;
-typedef Eigen::Map<const VectorXd> MapVec;
-typedef Eigen::SparseVector<double> SpVec;
-typedef Eigen::SparseMatrix<double> SpMat;
+// typedef Eigen::Map<const MatrixXd> MapMat;
+// typedef Eigen::Map<const VectorXd> MapVec;
+// typedef Eigen::SparseVector<double> SpVec;
+// typedef Eigen::SparseMatrix<double> SpMat;
 
-std::tuple<SpMat, int> 
+std::tuple<SpMat<double>, int> 
+ADMM::
 admm_bp(MapMat const& x_, MapVec const& y_, ADMMParam const& opts_)
 {
     int maxit = opts_.maxit;
@@ -32,7 +33,7 @@ admm_bp(MapMat const& x_, MapVec const& y_, ADMMParam const& opts_)
     ADMMBP solver(x_, y_, rho, eps_abs, eps_rel);
 
     int niter = solver.solve(maxit);
-    SpMat beta(x_.cols(), 1);
+    SpMat<double> beta(x_.cols(), 1);
     beta.col(0) = solver.get_z();
     beta.makeCompressed();
 

@@ -3,11 +3,11 @@
 #include "ADMMLAD.h"
 #include "DataStd.h"
 
-#include <ADMM/parameters.h>
+#include <ADMM/ADMM.h>
 
-using Eigen::MatrixXd;
-using Eigen::VectorXd;
-using Eigen::ArrayXd;
+// using Eigen::MatrixXd;
+// using Eigen::VectorXd;
+// using Eigen::ArrayXd;
 
 // using Rcpp::wrap;
 // using Rcpp::as;
@@ -18,6 +18,7 @@ using Eigen::ArrayXd;
 // using Rcpp::Named;
 
 std::tuple<ArrayXd, int>
+ADMM::
 admm_lad(MatrixXd x_, VectorXd y_,
          bool intercept_, ADMMParam const& opts_)
 {
