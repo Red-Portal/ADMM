@@ -1,6 +1,8 @@
 #ifndef ADMMLASSOWIDE_H
 #define ADMMLASSOWIDE_H
 
+#include <iostream>
+
 #include <Eigen/SparseCore>
 #include <Eigen/Cholesky>
 
@@ -189,12 +191,15 @@ protected:
     }
 
 public:
-    ADMMLassoWide(ConstGenericMatrix &datX_, ConstGenericVector &datY_,
+    ADMMLassoWide(ConstGenericMatrix &datX_,
+                  ConstGenericVector &datY_,
                   double eps_abs_ = 1e-6,
-                  double eps_rel_ = 1e-6) :
-        ADMMBase<Eigen::SparseVector<float>, Eigen::VectorXf, Eigen::VectorXf>
-                 (datX_.cols(), datX_.rows(), datX_.rows(),
-                 eps_abs_, eps_rel_),
+                  double eps_rel_ = 1e-6)
+        : ADMMBase<
+    Eigen::SparseVector<float>,
+    Eigen::VectorXf,
+    Eigen::VectorXf> (datX_.cols(), datX_.rows(),
+                      datX_.rows(), eps_abs_, eps_rel_),
         datX(datX_.data(), datX_.rows(), datX_.cols()),
         datY(datY_.data(), datY_.size()),
         lambda0((datX.transpose() * datY).cwiseAbs().maxCoeff()),
@@ -203,7 +208,10 @@ public:
         Matrix XX;
         Linalg::tcross_prod_lower(XX, datX);
         Spectra::DenseSymMatProd<Scalar> op(XX);
-        Spectra::SymEigsSolver< Scalar, Spectra::LARGEST_ALGE, Spectra::DenseSymMatProd<Scalar> > eigs(&op, 1, 3);
+        Spectra::SymEigsSolver<
+            Scalar,
+            Spectra::LARGEST_ALGE,
+            Spectra::DenseSymMatProd<Scalar> > eigs(&op, 1, 3);
         eigs.init();
         eigs.compute(10, 0.1);
         Vector evals = eigs.eigenvalues();

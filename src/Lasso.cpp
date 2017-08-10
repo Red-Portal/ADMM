@@ -58,7 +58,7 @@ admm_lasso(MatrixXf x_,VectorXf y_,
     ADMMLassoTall *solver_tall;
     ADMMLassoWide *solver_wide;
 
-    if(x_.rows() > y_.cols())
+    if(n > p)
         solver_tall = new ADMMLassoTall(x_, y_, eps_abs, eps_rel);
     else
         solver_wide = new ADMMLassoWide(x_, y_, eps_abs, eps_rel);
